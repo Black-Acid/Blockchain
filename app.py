@@ -1,7 +1,7 @@
 import redis
 from fastapi import FastAPI
 import schema as sma
-
+import fastapi
 app = FastAPI()
 
 # redis_client = redis.Redis(host='localhost', port=6379, db=0)
@@ -43,13 +43,15 @@ def add_new_book(post_request: sma.BooksPostRequest):
     
     return "Your Book has been successfully added"
 
-@app.put("/api/update-a-book")
-def updateBook(post_request: sma.BooksPostRequest):
-    if post_request.title in books:
-        books[post_request.title] = {
-            "author": post_request.author,
-            "rating": post_request.rating
-        }
-        return books[post_request.title]
+@app.put("/api/update-a-book/{title}")
+def updateBook(post_request: sma.BooksPostRequest, title:str):
+    if title not in books:
+        raise fastapi.HTTPException(status_code=404, detail="Book not found")
+    books[title] = {
+        "author": post_request.author,
+        "rating": post_request.rating
+        
+    }
+        
     return f"{post_request.title} does not exist"
     
